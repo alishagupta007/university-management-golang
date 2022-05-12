@@ -12,7 +12,6 @@ import (
 
 const port = "2345"
 
-
 //db
 const (
 	username = "postgres"
@@ -22,6 +21,13 @@ const (
 	dbName = "postgres"
 	schema = "public"
 )
+
+type Student struct {
+	ID           int64  `db:"id"`
+	Name         string `db:"name"`
+	RollNo       string `db:"rollno"`
+	DepartmentId int64  `db:"departmentid"`
+}
 
 func main() {
 	err := migrations.MigrationsUp(username, password, host, dbPort, dbName, schema)
@@ -65,9 +71,23 @@ func insertSeedData(connectionManager connection.DatabaseConnectionManager) {
 		log.Fatalf("Could not delete from department table. Err: %+v", err)
 	}
 
+	log.Println("Cleaning up students table")
+	_, err = connection.GetSession().DeleteFrom("students").Exec()
+	if err != nil {
+		log.Fatalf("Could not delete from students table. Err: %+v", err)
+	}
 	log.Println("Inserting into department table")
 	_, err = connection.GetSession().InsertInto("department").Columns("name").
 		Values("Computer Science").Exec()
+
+	log.Println("Inserting into students table")
+	studentData := &Student{
+		Name:         "Rahul",
+		RollNo:       "145008",
+		DepartmentId: 1,
+		ID: 2,
+	}
+	_, err = connection.GetSession().InsertInto("students").Columns("id","name", "rollno", "departmentid").Record(studentData).Exec()
 
 	if err != nil {
 		log.Fatalf("Could not insert into department table. Err: %+v", err)

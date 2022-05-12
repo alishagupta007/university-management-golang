@@ -21,8 +21,12 @@ func main() {
 	client := university_management.NewUniversityManagementServiceClient(conn)
 	var departmentID int32 = 1
 	departmentResponse, err := client.GetDepartment(context.TODO(), &university_management.GetDepartmentRequest{Id: departmentID})
+
+	studentsResponse, err := client.GetStudents(context.TODO(), &university_management.GetStudentsRequest{DepartmentId: departmentID})
+
 	if err != nil {
 		log.Fatalf("Error occured while fetching department for id %d,err: %+v", departmentID, err)
 	}
 	log.Println(departmentResponse)
+	log.Println(studentsResponse)
 }

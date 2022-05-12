@@ -15,7 +15,8 @@ type universityManagementServer struct {
 
 func (u *universityManagementServer) GetDepartment(ctx context.Context, request *um.GetDepartmentRequest) (*um.GetDepartmentResponse, error) {
 	connection, err := u.connectionManager.GetConnection()
-	defer u.connectionManager.CloseConnection()
+
+	//defer u.connectionManager.CloseConnection()
 
 	if err != nil {
 		log.Fatalf("Error: %+v", err)
@@ -39,4 +40,33 @@ func NewUniversityManagementHandler(connectionmanager connection.DatabaseConnect
 	return &universityManagementServer {
 		connectionManager: connectionmanager,
 	}
+}
+
+func (u *universityManagementServer) GetStudents(ctx context.Context, request *um.GetStudentsRequest) (*um.GetStudentsResponse, error) {
+	connection, err := u.connectionManager.GetConnection()
+
+	if err != nil {
+		log.Fatalf("Error: %+v", err)
+	}
+
+	var students []um.Student
+
+	connection.GetSession().Select("id", "name", "rollno").From("students").Where("departmentid = ?", request.GetDepartmentId()).Load(&students)
+
+	_, err = json.Marshal(&students)
+	if err != nil {
+		log.Fatalf("Error while marshaling %+v", err)
+	}
+
+	var finalStudents []*um.Student
+	for _,val := range  students{
+		var temp = um.Student{
+			Id: val.Id,
+			Name: val.Name,
+			RollNo: val.RollNo,
+			DepartmentId: val.DepartmentId,
+		}
+		finalStudents = append(finalStudents,&temp)
+	}
+	return &um.GetStudentsResponse{Student: finalStudents}, nil
 }
