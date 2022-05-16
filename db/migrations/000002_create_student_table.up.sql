@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS students (
-    id bigint NOT NULL,
+    id serial PRIMARY KEY ,
     name text,
     rollNo text,
     departmentId bigint

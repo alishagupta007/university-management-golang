@@ -66,7 +66,7 @@ func insertSeedData(connectionManager connection.DatabaseConnectionManager) {
 	}
 
 	log.Println("Cleaning up department table")
-	_, err = connection.GetSession().DeleteFrom("department").Exec()
+	_, err = connection.GetSession().DeleteFrom("departments").Exec()
 	if err != nil {
 		log.Fatalf("Could not delete from department table. Err: %+v", err)
 	}
@@ -77,17 +77,23 @@ func insertSeedData(connectionManager connection.DatabaseConnectionManager) {
 		log.Fatalf("Could not delete from students table. Err: %+v", err)
 	}
 	log.Println("Inserting into department table")
-	_, err = connection.GetSession().InsertInto("department").Columns("name").
-		Values("Computer Science").Exec()
+	//_, err = connection.GetSession().InsertInto("departments").Columns("name").
+	//	Values("Computer Science").Exec()
 
 	log.Println("Inserting into students table")
-	studentData := &Student{
-		Name:         "Rahul",
-		RollNo:       "145008",
-		DepartmentId: 1,
-		ID: 2,
-	}
-	_, err = connection.GetSession().InsertInto("students").Columns("id","name", "rollno", "departmentid").Record(studentData).Exec()
+	//studentData := &Student{
+	//	Name:         "Rahul",
+	//	RollNo:       "145008",
+	//	DepartmentId: 1,
+	//}
+	//_, err = connection.GetSession().InsertInto("students").Columns("name", "rollno", "departmentid").Record(studentData).Exec()
+	//
+	//_, err = connection.GetSession().InsertInto("staff").Columns("name").Values("Staff1").Exec()
+	//_, err = connection.GetSession().InsertInto("staff").Columns("name").Values("Staff2").Exec()
+	//_, err = connection.GetSession().InsertInto("staff").Columns("name").Values("Staff3").Exec()
+	//_, err = connection.GetSession().InsertInto("department_staff").Columns("department_id", "staff_id").Values(4, 2).Exec()
+	//_, err = connection.GetSession().InsertInto("department_staff").Columns("department_id", "staff_id").Values(4, 3).Exec()
+
 
 	if err != nil {
 		log.Fatalf("Could not insert into department table. Err: %+v", err)

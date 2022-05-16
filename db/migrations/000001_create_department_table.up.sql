@@ -1,4 +1,4 @@
 CREATE TABLE IF NOT EXISTS departments (
-    id bigint NOT NULL,
+    id serial PRIMARY KEY,
     name text
 );
