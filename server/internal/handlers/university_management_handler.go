@@ -82,18 +82,9 @@ func (u *universityManagementServer) GetStaffForStudent(ctx context.Context, req
 
 	connection.GetSession().Select("department_staff.staff_id as id", "staff.name").From("students").Join("departments", "departments.id=students.departmentid").Join("department_staff", "departments.id=department_staff.department_id").Join("staff", "staff.id = department_staff.staff_id").Where("rollno = ?", request.GetRollNo()).Load(&staff)
 
-	_, err = json.Marshal(&staff)
-	if err != nil {
-		log.Fatalf("Error while marshaling %+v", err)
-	}
-
 	var staffMembers []*um.Staff
 	for _,val := range  staff{
-		var temp = um.Staff{
-			Id: val.Id,
-			Name: val.Name,
-		}
-		staffMembers = append(staffMembers,&temp)
+		staffMembers = append(staffMembers,&val)
 	}
 	return &um.GetStaffForStudentResponse{Staff: staffMembers},err
 }
