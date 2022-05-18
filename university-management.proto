@@ -46,6 +46,22 @@ message GetStaffForStudentResponse {
   repeated Staff staff = 1;
 }
 
+message LoginRequest{
+  int32 id = 1;
+}
+
+message LoginResponse{
+  string message = 1;
+}
+
+message LogoutRequest{
+  int32 id = 1;
+}
+
+message LogoutResponse{
+  string message = 1;
+}
+
 service UniversityManagementService {
   rpc GetDepartment (GetDepartmentRequest) returns (GetDepartmentResponse) {
   }
@@ -54,6 +70,13 @@ service UniversityManagementService {
   }
 
   rpc GetStaffForStudent (GetStaffForStudentRequest) returns (GetStaffForStudentResponse) {
-
   }
+
+  rpc Login (LoginRequest) returns (LoginResponse){
+  }
+
+  rpc Logout (LogoutRequest) returns (LogoutResponse){
+  }
+
+
 }

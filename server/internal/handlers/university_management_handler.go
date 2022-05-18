@@ -88,3 +88,62 @@ func (u *universityManagementServer) GetStaffForStudent(ctx context.Context, req
 	}
 	return &um.GetStaffForStudentResponse{Staff: staffMembers},err
 }
+
+func (u *universityManagementServer) Login(ctx context.Context, request *um.LoginRequest) (*um.LoginResponse, error) {
+	defer recoverFunc()
+
+	connection, err := u.connectionManager.GetConnection()
+
+	if err != nil {
+		log.Fatalf("Error: %+v", err)
+	}
+
+	_,err = connection.GetSession().InsertBySql(
+		`INSERT INTO student_attendance(student_id, login_time, date)
+				VALUES(?,CURRENT_TIME, CURRENT_DATE) 
+				ON CONFLICT ON CONSTRAINT student_date_unique
+				DO UPDATE SET login_time=EXCLUDED.login_time
+				WHERE student_attendance.login_time IS NULL`,
+				request.GetId(),
+		).Exec()
+
+	if err != nil {
+		panic("runtime error: Error trying to login, incorrect student id passed")
+	}
+
+	return &um.LoginResponse{
+		Message: "Login successful",
+	}, err
+}
+
+func recoverFunc() {
+	if r := recover(); r!= nil {
+		log.Println("Recovered from failure")
+	}
+}
+
+func (u *universityManagementServer) Logout(ctx context.Context, request *um.LogoutRequest) (*um.LogoutResponse, error) {
+	defer recoverFunc()
+
+	connection, err := u.connectionManager.GetConnection()
+
+	if err != nil {
+		log.Fatalf("Error: %+v", err)
+	}
+
+	_, err =  connection.GetSession().InsertBySql(
+		`INSERT INTO student_attendance(student_id, logout_time, date)
+				VALUES(?,CURRENT_TIME, CURRENT_DATE) 
+				ON CONFLICT ON CONSTRAINT student_date_unique
+				DO UPDATE  SET logout_time=EXCLUDED.logout_time
+               `,request.GetId(),
+	).Exec()
+
+	if err != nil {
+		panic("runtime error: Error trying to logout, incorrect student id passed")
+	}
+
+	return &um.LogoutResponse{
+		Message: "Logout Successful",
+	}, err
+}

@@ -4,6 +4,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"time"
 	migrations "university-management-golang/db"
 	"university-management-golang/db/connection"
 	um "university-management-golang/protoclient/university_management"
@@ -66,13 +67,13 @@ func insertSeedData(connectionManager connection.DatabaseConnectionManager) {
 	}
 
 	log.Println("Cleaning up department table")
-	_, err = connection.GetSession().DeleteFrom("departments").Exec()
+	//_, err = connection.GetSession().DeleteFrom("departments").Exec()
 	if err != nil {
 		log.Fatalf("Could not delete from department table. Err: %+v", err)
 	}
 
 	log.Println("Cleaning up students table")
-	_, err = connection.GetSession().DeleteFrom("students").Exec()
+	//_, err = connection.GetSession().DeleteFrom("students").Exec()
 	if err != nil {
 		log.Fatalf("Could not delete from students table. Err: %+v", err)
 	}
@@ -93,6 +94,9 @@ func insertSeedData(connectionManager connection.DatabaseConnectionManager) {
 	//_, err = connection.GetSession().InsertInto("staff").Columns("name").Values("Staff3").Exec()
 	//_, err = connection.GetSession().InsertInto("department_staff").Columns("department_id", "staff_id").Values(4, 2).Exec()
 	//_, err = connection.GetSession().InsertInto("department_staff").Columns("department_id", "staff_id").Values(4, 3).Exec()
+	dt := time.Now().UTC()
+
+	_, err = connection.GetSession().InsertInto("student_attendance").Columns("student_id", "login_time", "date").Values(4,dt.Format("03:04:05"), dt.Format("2006-01-02") ).Exec()
 
 
 	if err != nil {
