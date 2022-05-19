@@ -3,7 +3,9 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"time"
 	"university-management-golang/db/connection"
 	um "university-management-golang/protoclient/university_management"
 )
@@ -147,3 +149,40 @@ func (u *universityManagementServer) Logout(ctx context.Context, request *um.Log
 		Message: "Logout Successful",
 	}, err
 }
+
+func (u *universityManagementServer) Notify(ctx context.Context, request *um.GetNotifyRequest) (*um.GetNotifyResponse, error) {
+	channel := make(chan string)
+
+	go u.waitForStudentToLogin(request.GetId(), channel)
+
+	message := <-channel
+
+	return &um.GetNotifyResponse{Message: message}, nil
+}
+
+func (u *universityManagementServer) waitForStudentToLogin(ids []int32, channel chan string) {
+	connection, err := u.connectionManager.GetConnection()
+
+	if err != nil {
+		log.Fatalf("Error: %+v", err)
+	}
+
+	for {
+		time.Sleep(1 * time.Second)
+        var userLogin struct{
+        	StudentId string `db:"student_id,omitempty"`
+		}
+
+		if len(ids) != 0 {
+			connection.GetSession().Select("student_id").From("student_attendance").Where("student_id IN (?)", ids).LoadOne(&userLogin)
+		}else {
+			connection.GetSession().Select("student_id").From("student_attendance").LoadOne(&userLogin)
+		}
+
+		if userLogin.StudentId != "" {
+			channel <- fmt.Sprintf("User %s has logged in", userLogin.StudentId)
+			return
+		}
+	}
+}
+
